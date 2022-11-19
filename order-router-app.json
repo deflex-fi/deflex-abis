@@ -1,0 +1,55 @@
+{
+	"name": "Order Router Protocol (ORP)",
+	"desc": "Interface for ORP app",
+	"methods": [
+		{
+			"name": "User_opt_into_assets",
+			"desc": "Opt the smart contract into an asset",
+			"args": [],
+			"returns": {"type": "void"}
+		},
+		{
+			"name": "User_swap",
+			"desc": "Perform a swap",
+			"args": [
+				{"type": "uint64", "name": "protocol", "desc": "DEX protocol ID"},
+				{"type": "asset", "name": "input_asset", "desc": "Input asset"},
+				{"type": "asset", "name": "output_asset", "desc": "Output asset"},
+				{"type": "application", "name": "dex_application_id", "desc": "DEX Application ID"},
+				{"type": "application", "name": "dex_manager_application_id", "desc": "DEX Manager Application ID"},
+				{
+					"type": "uint64",
+					"name": "percent_bps_balance_amount_in",
+					"desc": "Percent of current balance of input asset to swap"
+				},
+				{
+					"type": "uint64",
+					"name": "amount_in_offset",
+					"desc": "Amount to deduct from percent bps of input asset to swap"
+				},
+				{"type": "byte[]", "name": "unstructured_metadata_bytes", "desc": "Unstructured metadata for swap"},
+				{"type": "byte[]", "name": "swap_notes", "desc": "Note for swap txns"}
+			],
+			"returns": {"type": "void"}
+		},
+		{
+			"name": "User_swap_finalize",
+			"desc": "Perform a swap",
+			"args": [
+				{"type": "asset", "name": "input_asset", "desc": "Input asset"},
+				{"type": "asset", "name": "output_asset", "desc": "Output asset"},
+				{"type": "uint64", "name": "min_amount_out", "desc": "Min amount out"},
+				{"type": "uint64", "name": "type", "desc": "Swap type. 0 for fixed-input, 1 for fixed-output"},
+				{"type": "account", "name": "beneficiary", "desc": "The beneficiary that receives the output"},
+				{"type": "account", "name": "treasury_account", "desc": "Order router treasury account"},
+				{"type": "account", "name": "referrer_account", "desc": "Referrer account (for fees)"},
+				{
+					"type": "uint64",
+					"name": "fee_bps",
+					"desc": "Output fee bps charged on output, split equally between treasury and referrer. Must be at least 4."
+				}
+			],
+			"returns": {"type": "void"}
+		}
+	]
+}
