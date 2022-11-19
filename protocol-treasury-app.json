@@ -1,0 +1,21 @@
+{
+  "name": "Protocol Treasury App",
+  "methods": [
+    {
+      "name": "User_opt_into_assets",
+      "args": [
+        {
+          "type": "pay",
+          "name": "funding_txn",
+          "desc": "A payment transaction to fund the app with 100'000 microALGO per asset in the foreign assets array."
+        }
+      ],
+      "returns": {
+        "type": "void"
+      },
+      "desc": "Opt the treasury into all assets in the foreign assets array."
+    }
+  ],
+  "networks": {},
+  "desc": "This treasury app collects the protocol's earned fees"
+}
