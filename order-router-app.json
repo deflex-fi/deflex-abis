@@ -1,55 +1,127 @@
+
 {
-	"name": "Order Router Protocol (ORP)",
-	"desc": "Interface for ORP app",
-	"methods": [
-		{
-			"name": "User_opt_into_assets",
-			"desc": "Opt the smart contract into an asset",
-			"args": [],
-			"returns": {"type": "void"}
-		},
-		{
-			"name": "User_swap",
-			"desc": "Perform a swap",
-			"args": [
-				{"type": "uint64", "name": "protocol", "desc": "DEX protocol ID"},
-				{"type": "asset", "name": "input_asset", "desc": "Input asset"},
-				{"type": "asset", "name": "output_asset", "desc": "Output asset"},
-				{"type": "application", "name": "dex_application_id", "desc": "DEX Application ID"},
-				{"type": "application", "name": "dex_manager_application_id", "desc": "DEX Manager Application ID"},
-				{
-					"type": "uint64",
-					"name": "percent_bps_balance_amount_in",
-					"desc": "Percent of current balance of input asset to swap"
-				},
-				{
-					"type": "uint64",
-					"name": "amount_in_offset",
-					"desc": "Amount to deduct from percent bps of input asset to swap"
-				},
-				{"type": "byte[]", "name": "unstructured_metadata_bytes", "desc": "Unstructured metadata for swap"},
-				{"type": "byte[]", "name": "swap_notes", "desc": "Note for swap txns"}
-			],
-			"returns": {"type": "void"}
-		},
-		{
-			"name": "User_swap_finalize",
-			"desc": "Perform a swap",
-			"args": [
-				{"type": "asset", "name": "input_asset", "desc": "Input asset"},
-				{"type": "asset", "name": "output_asset", "desc": "Output asset"},
-				{"type": "uint64", "name": "min_amount_out", "desc": "Min amount out"},
-				{"type": "uint64", "name": "type", "desc": "Swap type. 0 for fixed-input, 1 for fixed-output"},
-				{"type": "account", "name": "beneficiary", "desc": "The beneficiary that receives the output"},
-				{"type": "account", "name": "treasury_account", "desc": "Order router treasury account"},
-				{"type": "account", "name": "referrer_account", "desc": "Referrer account (for fees)"},
-				{
-					"type": "uint64",
-					"name": "fee_bps",
-					"desc": "Output fee bps charged on output, split equally between treasury and referrer. Must be at least 4."
-				}
-			],
-			"returns": {"type": "void"}
-		}
-	]
+  "name": "Order Router App",
+  "methods": [
+    {
+      "name": "User_opt_into_assets",
+      "args": [
+        {
+          "type": "uint64",
+          "name": "expected_amount_out"
+        },
+        {
+          "type": "uint64",
+          "name": "finalize_index_offset"
+        }
+      ],
+      "returns": {
+        "type": "void"
+      },
+      "desc": "Opt the order-router app into all assets in the foreign assets array. Set global state for expected amount out"
+    },
+    {
+      "name": "User_swap",
+      "args": [
+        {
+          "type": "uint64",
+          "name": "nr_swaps"
+        },
+        {
+          "type": "uint64[3]",
+          "name": "protocol_list",
+          "desc": "The IDs of the protocol (0=Algofi, 1=Pact, 2=Humble)."
+        },
+        {
+          "type": "uint64[2][3]",
+          "name": "assets_list",
+          "desc": "The assets involved in the swap."
+        },
+        {
+          "type": "uint64[2][3]",
+          "name": "applications_list",
+          "desc": "The applications involved in the sequence of swaps."
+        },
+        {
+          "type": "address[3]",
+          "name": "accounts_list",
+          "desc": "The accounts involved in the sequence of swaps."
+        },
+        {
+          "type": "uint64[3]",
+          "name": "percent_bps_balance_amount_in_list",
+          "desc": "Percent of current balance of input asset to swap for each swap."
+        },
+        {
+          "type": "uint64[3]",
+          "name": "amount_in_offset_list",
+          "desc": "Amount to deduct from percent bps of input asset to swap (for fixed-output) for each swap."
+        },
+        {
+          "type": "byte[][3]",
+          "name": "protocol_specific_arg_list",
+          "desc": "Unstructured metadata for each swap."
+        },
+        {
+          "type": "byte[]",
+          "name": "swap_note",
+          "desc": "Note for swap txns."
+        }
+      ],
+      "returns": {
+        "type": "void"
+      },
+      "desc": "Perform a sequence of swaps that is part of a bigger sequence of swaps. Must eventually be followed by a call to User_swap_finalize."
+    },
+    {
+      "name": "User_swap_finalize",
+      "args": [
+        {
+          "type": "asset",
+          "name": "asset_in",
+          "desc": "The input asset (0 if ALGO)."
+        },
+        {
+          "type": "asset",
+          "name": "asset_out",
+          "desc": "The output asset (0 if ALGO)."
+        },
+        {
+          "type": "uint64",
+          "name": "min_amount_out",
+          "desc": "The minimum amount that needs to be generated for the swap to succeed."
+        },
+        {
+          "type": "uint64",
+          "name": "type",
+          "desc": "Swap type. 0 for fixed-input, 1 for fixed-output."
+        },
+        {
+          "type": "account",
+          "name": "beneficiary",
+          "desc": "The beneficiary that receives the output."
+        },
+        {
+          "type": "account",
+          "name": "treasury_address_param",
+          "desc": "The account of Deflex's protocol treasury."
+        },
+        {
+          "type": "account",
+          "name": "referrer_address",
+          "desc": "Referrer account (for fees)."
+        },
+        {
+          "type": "uint64",
+          "name": "fee_bps",
+          "desc": "Output fee bps charged on output, split equally between treasury and referrer. Must be at least 4."
+        }
+      ],
+      "returns": {
+        "type": "void"
+      },
+      "desc": "Finalize a sequence of swaps and send the generated output back to the user."
+    }
+  ],
+  "networks": {},
+  "desc": "The order router app is used to atomically perform multiple swaps through Algorand DEXes.The swaps are performed using contract-to-contract calls. Assets are sent to the app address before a group of swaps. After a swap, the app can eitherclose out all assets to a beneficiary, or return the assets for future swaps inthe transaction group (allowing users to perform multi-hop swaps through differenttrading pairs)."
 }
