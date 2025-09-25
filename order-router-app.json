@@ -1,4 +1,3 @@
-
 {
   "name": "Order Router App",
   "methods": [
@@ -29,7 +28,7 @@
         {
           "type": "uint64[3]",
           "name": "protocol_list",
-          "desc": "The IDs of the protocol (0=Algofi, 1=Pact, 2=Humble)."
+          "desc": "The IDs of the protocol (0=Algofi, 1=Pact, 2=Humble, 3=Tinyman, 4=Algomint, 6=FOLKS Dep, 7=FOLKS Withdraw, 8=TALGO Mint, 9=TALGO Unmint, 10=XALGO Mint, 11=XALGO Unmint)."
         },
         {
           "type": "uint64[2][3]",
@@ -84,6 +83,11 @@
           "type": "asset",
           "name": "asset_out",
           "desc": "The output asset (0 if ALGO)."
+        },
+        {
+          "type": "uint64[10]",
+          "name": "opt_out_list",
+          "desc": "The list of assets to opt out of."
         },
         {
           "type": "uint64",
